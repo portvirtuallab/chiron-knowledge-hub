@@ -55,10 +55,11 @@ button,input,select,textarea{font:inherit;color:inherit}
 .top{position:sticky;top:0;z-index:30;background:var(--quay);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
 .top-in{display:flex;align-items:center;gap:20px;height:64px}
 .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
-.brand-mark{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;flex:none}
-.brand-mark img{width:100%;height:100%;object-fit:cover}
-.brand b{font:800 26px/1 var(--display);letter-spacing:.02em}
-.brand small{font-size:12.5px;color:#a9bbd8;font-weight:500;display:block;margin-top:2px}
+.brand-mark{width:50px;height:44px;border-radius:8px;background:#fff;display:grid;place-items:center;padding:5px 6px;flex:none}
+.brand-mark img{width:100%;height:100%;object-fit:contain}
+.brand b{font:800 27px/1 var(--display);letter-spacing:.02em}
+.brand small{font-size:12px;color:#a9bbd8;font-weight:500;display:block;margin-top:3px}
+@media (max-width:420px){.brand small{display:none}}
 .nav{display:flex;gap:4px;margin-left:auto}
 .nav a{color:#d6e1f2;text-decoration:none;font-weight:600;font-size:14.5px;padding:8px 12px;border-radius:999px}
 .nav a:hover{background:rgba(255,255,255,.08);color:#fff}
@@ -180,6 +181,23 @@ details.case:not([open]) summary i .c{display:none}
 .empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
 .share{margin-top:26px;display:flex;gap:12px 18px;align-items:center;flex-wrap:wrap;color:var(--muted)}
 
+/* members library */
+.lib-lock{display:grid;grid-template-columns:auto 1fr auto;gap:18px 26px;align-items:center;background:var(--quay);color:#fff;border-radius:16px;padding:26px 28px}
+.lib-lock .key{width:56px;height:56px;border-radius:14px;background:var(--amber);display:grid;place-items:center}
+.lib-lock h3{font:800 34px/1 var(--display);margin:0 0 6px}
+.lib-lock p{margin:0;color:#c8d6eb;max-width:60ch}
+@media (max-width:760px){.lib-lock{grid-template-columns:1fr}}
+.lib-bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin-bottom:22px}
+.lib-bar p{margin:0;color:var(--muted)}
+.lib-cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:30px}
+.lib-cat h3{font:800 30px/1 var(--display);margin:0 0 6px;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.lib-cat ul{list-style:none;margin:0;padding:0}
+.lib-item{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.lib-item .badge{font:800 15px/1 var(--display);text-align:center;border-radius:6px;padding:7px 4px;color:#fff;background:var(--blue);letter-spacing:.02em}
+.lib-item .badge.PDF{background:var(--coral)}.lib-item .badge.Slides{background:#d98a0b}.lib-item .badge.Video{background:var(--quay)}.lib-item .badge.Web{background:var(--cyan)}
+.lib-item b{font-weight:600;line-height:1.35;display:block}
+.lib-item small{color:var(--muted);font-size:13px}
+.lib-msg{color:var(--muted);padding:20px 0}
 /* sessions: departures board */
 .board{border-top:2px solid var(--ink)}
 .dep{display:grid;grid-template-columns:110px minmax(0,1fr) 200px auto;gap:6px 24px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line)}
@@ -271,6 +289,12 @@ details.case:not([open]) summary i .c{display:none}
 
 /* join */
 .join{background:var(--quay);color:#fff;margin-top:84px;padding:72px 0}
+.join-in{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;align-items:start}
+.join-card{background:#fff;border-radius:18px;padding:26px 24px 20px;box-shadow:0 18px 40px rgba(0,0,0,.25);transform:rotate(1.5deg)}
+.join-card img{width:100%;height:auto}
+.join-card .by{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid #dfe7ef;font-size:12px;color:#5d6e84}
+.join-card .by img{width:96px}
+@media (max-width:860px){.join-in{grid-template-columns:1fr}.join-card{max-width:240px;transform:none;order:-1}}
 .join h2{font:800 clamp(40px,5.4vw,66px)/.95 var(--display);margin:0 0 14px;max-width:16ch}
 .join .lead{color:#c8d6eb;max-width:56ch;margin:0 0 36px;font-size:17px}
 .path{list-style:none;margin:0 0 36px;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
@@ -287,12 +311,18 @@ footer.site{background:#071f47;color:#a9bbd8;font-size:14.5px}
 footer.site .wrap{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding-top:44px;padding-bottom:44px}
 @media (max-width:860px){footer.site .wrap{grid-template-columns:1fr 1fr}}
 @media (max-width:520px){footer.site .wrap{grid-template-columns:1fr}}
+.endorse{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.1)}
+.endorse .tile{background:#fff;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:12px;text-decoration:none}
+.endorse .tile img{height:34px;width:auto}
+.endorse .tile b{font:800 22px/1 var(--display);color:#0b2d63}
+.endorse p{color:#c8d6eb;font-size:14.5px;max-width:56ch}
+.endorse p b{color:#fff}
 footer.site h4{color:#fff;margin:0 0 10px;font-size:15px}
 footer.site ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 footer.site a{color:#fff}
 footer.site p{margin:0}
 .pilot{font-size:13px;color:#8aa0c4;border-top:1px solid rgba(255,255,255,.08)}
-.pilot .wrap{display:block;padding-top:16px;padding-bottom:20px}
+footer.site .pilot .wrap{display:block;padding-top:16px;padding-bottom:20px}
 
 /* dialogs */
 dialog{border:0;padding:0;border-radius:16px;max-width:720px;width:calc(100% - 28px);max-height:calc(100% - 32px);background:var(--surface);color:var(--ink)}
@@ -324,16 +354,18 @@ dialog[open]{animation:pop .22s ease-out}
 <header class="top">
   <div class="wrap top-in">
     <a class="brand" href="#top" aria-label="CHIRON Knowledge Hub, back to top">
-      <span class="brand-mark"><img src="../assets/chiron-symbol.png" alt="" onerror="this.remove()"></span>
-      <span><b>CHIRON</b><small>Knowledge Hub</small></span>
+      <span class="brand-mark"><img src="../assets/chiron-mark.png" alt=""></span>
+      <span><b>CHIRON</b><small>Knowledge Hub of Port Virtual Lab</small></span>
     </a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav class="nav" id="nav" aria-label="Sections">
       <a href="#method">Method</a>
       <a href="#resources">Resources</a>
       <a href="#sessions">Sessions</a>
+      <a href="#library">Library</a>
       <a href="#community">Community</a>
     </nav>
+    <button class="btn btn-line btn-sm" id="memberBtn" style="color:#fff">Members</button>
     <button class="btn btn-go btn-sm" data-profile>Create your profile</button>
   </div>
 </header>
@@ -404,6 +436,17 @@ dialog[open]{animation:pop .22s ease-out}
         <span>Have an activity that works in your class?</span>
         <button class="btn btn-quiet btn-sm" data-request="I would like to share a resource with the CHIRON network: ">Share it with the network</button>
       </div>
+    </div>
+  </section>
+
+  <!-- MEMBERS LIBRARY -->
+  <section class="block" id="library" aria-labelledby="libTitle">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="libTitle">Members library</h2>
+        <p>Webinar slides, teacher guides and recordings from CHIRON sessions. For teachers at Open Lab centres.</p>
+      </div>
+      <div id="libBox"></div>
     </div>
   </section>
 
@@ -503,17 +546,28 @@ dialog[open]{animation:pop .22s ease-out}
 
   <!-- JOIN -->
   <section class="join" aria-labelledby="joinTitle">
-    <div class="wrap">
+    <div class="wrap join-in">
+      <div>
       <h2 id="joinTitle">Make your practice visible</h2>
       <p class="lead">This year we are piloting a pathway so that what you do with PVL is seen and, step by step, recognised. It starts with your profile.</p>
       <ol class="path" id="path"></ol>
       <button class="btn btn-go" data-profile>Create your profile</button>
+      </div>
+      <figure class="join-card" style="margin:0">
+        <img src="../assets/chiron-lockup.png" alt="CHIRON. Empowering Educators, Enriching Learning">
+        <figcaption class="by"><span>An initiative of</span><img src="../assets/pvl-logo.png" alt="Port Virtual Lab"></figcaption>
+      </figure>
     </div>
   </section>
 </main>
 
 <footer class="site">
   <div class="wrap">
+    <div class="endorse">
+      <a class="tile" href="https://chiron.escolaeuropea.eu/" aria-label="CHIRON"><img src="../assets/chiron-mark.png" alt=""><b>CHIRON</b></a>
+      <a class="tile" href="https://www.pvl.one" aria-label="Port Virtual Lab, pvl.one"><img src="../assets/pvl-logo.png" alt="Port Virtual Lab"></a>
+      <p>Part of <b>PVL.ONE</b>. Powered by <b>Escola Europea – Intermodal Transport</b>, Barcelona.</p>
+    </div>
     <div><h4>CHIRON</h4><p>The network of educators teaching with Port Virtual Lab, run by Escola Europea – Intermodal Transport. Part of <a href="https://www.pvl.one">pvl.one</a>.</p></div>
     <div><h4>Contact</h4><ul><li><a href="mailto:teachers@escolaeuropea.eu">teachers@escolaeuropea.eu</a></li><li>Terminal Drassanes, Jardins de l’Areté</li><li>08039 Barcelona</li></ul></div>
     <div><h4>Family</h4><ul><li><a href="https://www.pvl.one">pvl.one</a></li><li><a href="https://escolaeuropea.eu">escolaeuropea.eu</a></li><li><a href="https://chiron.escolaeuropea.eu/">chiron.escolaeuropea.eu</a></li></ul></div>
@@ -574,6 +628,22 @@ dialog[open]{animation:pop .22s ease-out}
         <div><button class="btn btn-go" type="submit">Save my profile</button></div>
       </form>
     </div>
+  </div>
+</dialog>
+
+<!-- Members sign-in -->
+<dialog id="loginDlg" aria-labelledby="loginTitle">
+  <div class="dlg">
+    <button class="x" data-close aria-label="Close">×</button>
+    <form class="form" id="loginForm" style="border:0;padding:0;background:none">
+      <h2 id="loginTitle" style="font:800 38px/1 var(--display);margin:0;padding-right:44px">Members sign-in</h2>
+      <p class="intro">Use the CHIRON PIN your centre received and the email you registered with.</p>
+      <label>CHIRON PIN<input required name="pin" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+      <label>Your email<input required type="email" name="email" autocomplete="email"></label>
+      <p class="intro" id="loginErr" role="alert" style="color:var(--coral);margin:0;min-height:1.2em"></p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><button class="btn btn-go" type="submit">Sign in</button>
+        <span class="hint" style="font-size:14px;color:var(--muted)">No PIN? <a href="#community" data-close data-request="I would like the CHIRON PIN for my centre: ">Ask the team</a></span></div>
+    </form>
   </div>
 </dialog>
 
@@ -755,7 +825,7 @@ function renderBoard(){
 
   const past = EVENTS.filter(isPast).sort((a,b) => b.date.localeCompare(a.date)).map(e => ({...e, label:longDate(e)})).concat(EXTRA_RECORDINGS);
   $('#recList').innerHTML = past.map(v => `<li><b>${esc(v.title)}<small>${esc(v.label)}</small></b>
-    ${v.video ? `<a class="btn btn-quiet btn-sm" href="${esc(v.video)}" target="_blank" rel="noopener">Watch</a>` : `<button class="btn btn-quiet btn-sm" data-request="I would like access to the recording: ${esc(v.title)}">Request</button>`}</li>`).join('');
+    ${v.video ? `<a class="btn btn-quiet btn-sm" href="${esc(v.video)}" target="_blank" rel="noopener">Watch</a>` : `<a class="btn btn-quiet btn-sm" href="#library">Library</a>`}</li>`).join('');
   $('#podFormat').innerHTML = POD_FORMAT.map(([t,m]) => `<li>${t}<span>${m}</span></li>`).join('');
   $('#nextEps').innerHTML = NEXT_EPISODES.map(t => `<li><b>${esc(t)}</b><span></span></li>`).join('');
 }
@@ -894,7 +964,7 @@ async function submitWith(btn, label, fn){
 
 /* Profile */
 function openProfile(){ $('#proDlg').showModal(); }
-document.addEventListener('click', e => { if (e.target.closest('[data-profile]')){ e.preventDefault(); closeMenu(); openProfile(); } });
+document.addEventListener('click', e => { if (e.target.closest('[data-profile]')){ e.preventDefault(); closeMenu(); if ($('#loginDlg').open) $('#loginDlg').close(); openProfile(); } });
 $('#proDlg').addEventListener('click', e => { if (e.target === $('#proDlg') || e.target.closest('[data-close]')) $('#proDlg').close(); });
 $('#proForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -932,6 +1002,74 @@ $('#supportForm').addEventListener('submit', async e => {
   $('#again').onclick = () => location.reload();
 });
 
+/* ======================================================================
+   MEMBERS AREA (PIN + email registered in Clientify)
+   ====================================================================== */
+const store = {
+  get(){ try { const s = JSON.parse(localStorage.getItem('chiron-session') || 'null'); return s && s.exp > Date.now() ? s : null; } catch(e){ return null; } },
+  set(s){ try { localStorage.setItem('chiron-session', JSON.stringify(s)); } catch(e){} },
+  clear(){ try { localStorage.removeItem('chiron-session'); } catch(e){} }
+};
+let SESSION = store.get();
+async function callHub(payload){
+  const res = await fetch(FORM_ENDPOINT, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+  return res.json();
+}
+function memberUI(){
+  $('#memberBtn').textContent = SESSION ? 'Library' : 'Members';
+}
+function renderLock(){
+  $('#libBox').innerHTML = `<div class="lib-lock">
+    <div class="key"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0b2d63" stroke-width="2.4" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+    <div><h3>Sign in to open the library</h3><p>Use your centre’s CHIRON PIN and the email you registered with. Not registered yet? Create your profile first.</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-go" data-login>Sign in</button><button class="btn btn-line" data-profile>Create your profile</button></div>
+  </div>`;
+}
+async function loadLibrary(){
+  if (!SESSION){ renderLock(); return; }
+  $('#libBox').innerHTML = '<p class="lib-msg">Opening the library…</p>';
+  let r;
+  try { r = await callHub({action:'library', token:SESSION.token}); } catch(e){ r = {ok:false, error:'network'}; }
+  if (!r.ok){
+    if (r.error === 'session_expired'){ store.clear(); SESSION = null; memberUI(); renderLock(); toast('Your session expired. Please sign in again.'); return; }
+    $('#libBox').innerHTML = '<p class="lib-msg">We could not open the library right now. Please try again in a minute.</p>'; return;
+  }
+  const cats = {};
+  r.items.forEach(i => (cats[i.category] = cats[i.category] || []).push(i));
+  const order = ['Webinar slides','Teacher guides','Recordings'];
+  const names = Object.keys(cats).sort((a,b) => (order.indexOf(a)+99*(order.indexOf(a)<0)) - (order.indexOf(b)+99*(order.indexOf(b)<0)));
+  const size = n => n ? (n > 1048576 ? (n/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(n/1024))+' KB') : '';
+  $('#libBox').innerHTML = `<div class="lib-bar"><p>Signed in${SESSION.name ? ' as '+esc(SESSION.name) : ''}. ${r.items.length} items.</p><button class="btn btn-quiet btn-sm" id="signOut">Sign out</button></div>
+    <div class="lib-cats">${names.map(c => `<div class="lib-cat"><h3>${esc(c)}</h3><ul>${cats[c].map(i => `<li class="lib-item">
+      <span class="badge ${esc(i.kind.split(' ')[0])}">${esc(i.kind === 'Web page' ? 'Web' : i.kind === 'Document' ? 'Doc' : i.kind)}</span>
+      <span><b>${esc(i.title)}</b><small>${[size(i.size), i.updated ? new Date(i.updated).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : ''].filter(Boolean).join(', ')}</small></span>
+      <a class="btn btn-quiet btn-sm" href="${esc(i.url)}" target="_blank" rel="noopener">Open</a></li>`).join('')}</ul></div>`).join('')}</div>`;
+  $('#signOut').onclick = () => { store.clear(); SESSION = null; memberUI(); renderLock(); toast('Signed out'); };
+}
+function openLogin(){ $('#loginErr').textContent = ''; $('#loginDlg').showModal(); }
+$('#memberBtn').addEventListener('click', () => { if (SESSION) $('#library').scrollIntoView(); else openLogin(); });
+document.addEventListener('click', e => { if (e.target.closest('[data-login]')) openLogin(); });
+$('#loginDlg').addEventListener('click', e => { if (e.target === $('#loginDlg') || e.target.closest('[data-close]')) $('#loginDlg').close(); });
+$('#loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target), btn = e.target.querySelector('[type=submit]');
+  btn.disabled = true; btn.textContent = 'Checking…'; $('#loginErr').textContent = '';
+  let r; try { r = await callHub({action:'login', pin:fd.get('pin'), email:fd.get('email')}); } catch(err){ r = {ok:false, error:'network'}; }
+  btn.disabled = false; btn.textContent = 'Sign in';
+  if (!r.ok){
+    $('#loginErr').innerHTML = ({
+      bad_pin:'This PIN is not valid. Check it with your centre or ask the CHIRON team.',
+      not_registered:'This email is not registered yet. <a href="#" data-profile>Create your profile</a> and sign in again.',
+      bad_email:'Write a valid email address.',
+      members_closed:'The members area is not open yet.'
+    })[r.error] || 'We could not sign you in right now. Please try again.';
+    return;
+  }
+  SESSION = {token:r.token, name:r.name, exp:r.exp}; store.set(SESSION);
+  $('#loginDlg').close(); memberUI(); loadLibrary(); $('#library').scrollIntoView();
+  toast('Welcome' + (r.name ? ', ' + r.name : '') + '. The library is open.');
+});
+
 /* Calendar buttons */
 document.addEventListener('click', e => { const b = e.target.closest('[data-ics]'); if (b) downloadIcs(b.dataset.ics); });
 
@@ -943,6 +1081,7 @@ $('#nav').addEventListener('click', e => { if (e.target.closest('a')) closeMenu(
 /* ======================================================================
    START
    ====================================================================== */
+memberUI(); loadLibrary();
 renderScene(); renderNext(); renderLoop(); renderFilters(); renderResources(); renderBoard(); renderStatic();
 </script>
 </body>
