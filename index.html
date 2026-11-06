@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CHIRON Knowledge Hub</title>
+<meta name="description" content="CHIRON Knowledge Hub: the network of educators teaching with Port Virtual Lab. Method, resources, live sessions and support for teachers of logistics, transport and international trade.">
+<meta name="theme-color" content="#0b2d63">
+<meta property="og:title" content="CHIRON Knowledge Hub">
+<meta property="og:description" content="The network of educators teaching with Port Virtual Lab.">
+<meta property="og:image" content="https://chiron.escolaeuropea.eu/assets/chiron-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  CHIRON Knowledge Hub · public pilot · Escola Europea – Intermodal Transport
+  Content lives in the DATA block at the top of the <script>. Images live in ../assets/.
+  FORM_ENDPOINT = Apps Script web app (CHIRON → Clientify). No secrets in this file.
+-->
+<style>
+:root{
+  --quay:#0b2d63; --blue:#164194; --cyan:#009fe3; --amber:#f9b233; --coral:#e84e1b;
+  --paper:#f5f8fb; --surface:#ffffff; --line:#dfe7ef; --ink:#10233d; --muted:#5d6e84; --link:#164194;
+  --display:"Big Shoulders Display","Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --text:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --wrap:1180px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#08193a; --surface:#0e2450; --line:#1f3b6e; --ink:#e9eff8; --muted:#a3b5d0; --link:#5cc4f2; color-scheme:dark}
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--text);-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:var(--link)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:3px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 20px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 22px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2;transition:background .15s,color .15s,border-color .15s}
+.btn-go{background:var(--coral);color:#fff}
+.btn-go:hover{background:#c93f12}
+.btn-line{background:transparent;color:inherit;border:1.5px solid currentColor}
+.btn-line:hover{background:rgba(255,255,255,.08)}
+.btn-quiet{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn-quiet:hover{border-color:var(--link);color:var(--link)}
+.btn-sm{padding:8px 14px;font-size:13.5px}
+.btn[disabled]{opacity:.6;cursor:wait}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:30;background:var(--quay);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.top-in{display:flex;align-items:center;gap:20px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+.brand-mark{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;flex:none}
+.brand-mark img{width:100%;height:100%;object-fit:cover}
+.brand b{font:800 26px/1 var(--display);letter-spacing:.02em}
+.brand small{font-size:12.5px;color:#a9bbd8;font-weight:500;display:block;margin-top:2px}
+.nav{display:flex;gap:4px;margin-left:auto}
+.nav a{color:#d6e1f2;text-decoration:none;font-weight:600;font-size:14.5px;padding:8px 12px;border-radius:999px}
+.nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.menu-btn{display:none;margin-left:auto;background:none;border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;cursor:pointer}
+@media (max-width:900px){
+  .nav{display:none;position:absolute;left:0;right:0;top:64px;background:var(--quay);flex-direction:column;padding:8px 20px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .nav.open{display:flex}
+  .nav a{padding:12px 4px;font-size:16px;border-radius:0;border-bottom:1px solid rgba(255,255,255,.08)}
+  .menu-btn{display:block}
+  .top .btn-go{display:none}
+}
+
+/* ---------- hero ---------- */
+.hero{background:var(--quay);color:#fff;overflow:hidden;position:relative}
+.hero-in{display:grid;grid-template-columns:1.05fr 1fr;gap:24px;align-items:end;padding-top:56px}
+.hero h1{font:800 clamp(44px,6vw,80px)/.92 var(--display);letter-spacing:.005em;margin:0 0 22px;max-width:15ch}
+.hero .lead{font-size:18px;color:#c8d6eb;max-width:46ch;margin:0 0 28px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.next{display:grid;grid-template-columns:auto 1fr;gap:4px 18px;align-items:center;border-top:1px solid rgba(255,255,255,.18);padding:20px 0 40px;max-width:520px}
+.next-date{grid-row:span 3;font:900 52px/.85 var(--display);color:var(--amber);text-align:center;min-width:72px}
+.next-date span{display:block;font-size:20px;font-weight:800;letter-spacing:.04em;margin-top:4px}
+.next-kicker{font-size:13px;color:#a9bbd8;font-weight:600}
+.next-title{font-weight:700;font-size:16.5px;line-height:1.35}
+.next-act{margin-top:6px}
+.next-act button{background:none;border:0;color:var(--amber);font-weight:700;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.scene{align-self:end;width:100%;max-width:620px;justify-self:end}
+.scene svg{display:block;width:100%;height:auto}
+.box{transform:translateY(-260px);opacity:0;animation:drop .7s cubic-bezier(.3,1.35,.55,1) forwards}
+@keyframes drop{to{transform:translateY(0);opacity:1}}
+.spreader{animation:lift 3.6s ease-in-out forwards}
+@keyframes lift{0%,10%{transform:translateY(150px)}100%{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.box{transform:none;opacity:1}.spreader{transform:none}}
+@media (max-width:860px){
+  .hero-in{grid-template-columns:1fr;padding-top:36px}
+  .scene{order:-1;max-width:460px;justify-self:start;margin-bottom:-8px}
+  .next{padding-bottom:32px}
+}
+.licence{background:var(--amber);color:var(--quay);font-weight:600;font-size:14.5px}
+.licence .wrap{padding-top:12px;padding-bottom:12px;display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center}
+.licence a{color:var(--quay);font-weight:700}
+
+/* ---------- sections ---------- */
+section.block{padding:84px 0 0}
+section.block:last-of-type{padding-bottom:84px}
+.head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:end;margin-bottom:32px}
+.head h2{font:800 clamp(38px,5vw,60px)/.95 var(--display);margin:0;letter-spacing:.005em}
+.head p{grid-column:1;margin:0;color:var(--muted);max-width:62ch;font-size:16.5px}
+.head .side{grid-row:1/span 2;grid-column:2;align-self:end}
+@media (max-width:700px){.head{grid-template-columns:1fr}.head .side{grid-row:auto;grid-column:1}}
+
+/* method: the loop */
+.loop{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);counter-reset:s}
+.loop li{border-top:6px solid var(--amber);padding:0}
+.loop li:nth-child(2){border-color:#f39c33}.loop li:nth-child(3){border-color:var(--coral)}.loop li:nth-child(4){border-color:var(--cyan)}.loop li:nth-child(5){border-color:var(--blue)}
+.loop button{all:unset;box-sizing:border-box;display:block;width:100%;height:100%;padding:18px 18px 22px 0;cursor:pointer}
+.loop button:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
+.loop .n{font:800 20px/1 var(--display);color:var(--muted)}
+.loop .t{display:block;font:800 34px/1 var(--display);margin:6px 0 8px}
+.loop .d{display:block;font-size:14.5px;color:var(--muted);line-height:1.5}
+.loop .c{display:inline-block;margin-top:12px;font-size:13px;font-weight:700;color:var(--link)}
+.loop button:hover .t{color:var(--link)}
+.loop button[aria-pressed="true"] .t{color:var(--coral)}
+@media (max-width:900px){
+  .loop{grid-template-columns:1fr}
+  .loop li{border-top:0;border-left:6px solid var(--amber);margin-bottom:6px}
+  .loop button{padding:12px 0 14px 18px;display:grid;grid-template-columns:auto 1fr;gap:0 12px}
+  .loop .n{grid-row:span 3;padding-top:6px}
+  .loop .t{font-size:28px;margin:0 0 2px}
+}
+.method-note{margin:28px 0 0;color:var(--muted);max-width:66ch}
+
+details.case{margin-top:36px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.case summary{list-style:none;cursor:pointer;padding:20px 22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+details.case summary::-webkit-details-marker{display:none}
+details.case summary b{font:800 28px/1 var(--display)}
+details.case summary span{color:var(--muted);font-size:14.5px}
+details.case summary i{font-style:normal;font-weight:700;color:var(--link);font-size:14px}
+details.case[open] summary i .o{display:none}
+details.case:not([open]) summary i .c{display:none}
+.tpl{list-style:none;margin:0;padding:0 22px 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px 26px}
+.tpl li{border-top:1px solid var(--line);padding-top:12px}
+.tpl .k{font:800 22px/1 var(--display);color:var(--coral)}
+.tpl b{display:block;margin:6px 0 4px;font-size:15.5px}
+.tpl p{margin:0;font-size:14px;color:var(--muted)}
+.tpl li.key{border-top:3px solid var(--amber)}
+.tpl-foot{padding:0 22px 22px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:14.5px}
+@media (max-width:900px){.tpl{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.tpl{grid-template-columns:1fr}}
+
+/* resources */
+.tools{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+.search{flex:1 1 260px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:0 14px}
+.search input{flex:1;border:0;background:none;outline:0;padding:11px 0;min-width:0}
+.search:focus-within{border-color:var(--cyan)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--quay);border-color:var(--quay);color:#fff}
+@media (prefers-color-scheme:dark){.chip[aria-pressed="true"]{background:var(--cyan);border-color:var(--cyan);color:#08193a}}
+.tools select{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;font-size:14px}
+.filter-note{font-size:14px;color:var(--muted);margin:-8px 0 18px;min-height:1.6em}
+.filter-note button{background:none;border:0;color:var(--link);font-weight:700;cursor:pointer;padding:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media (max-width:960px){.grid{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.grid{grid-template-columns:1fr}}
+.res{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:border-color .15s}
+.res:hover{border-color:var(--cyan)}
+.res:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.res .cv{aspect-ratio:16/8;position:relative;overflow:hidden}
+.res .cv svg{width:100%;height:100%;display:block}
+.res .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.res .kind{font-size:13px;font-weight:700;color:var(--link)}
+.res h3{margin:0;font-size:18px;line-height:1.3}
+.res p{margin:0;font-size:14.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.res .foot{margin-top:auto;padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.steps{display:flex;gap:3px}
+.steps i{width:16px;height:5px;border-radius:2px;background:var(--line)}
+.steps i.on{background:var(--amber)}
+.empty{grid-column:1/-1;border:1.5px dashed var(--line);border-radius:12px;padding:32px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+.share{margin-top:26px;display:flex;gap:12px 18px;align-items:center;flex-wrap:wrap;color:var(--muted)}
+
+/* sessions: departures board */
+.board{border-top:2px solid var(--ink)}
+.dep{display:grid;grid-template-columns:110px minmax(0,1fr) 200px auto;gap:6px 24px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line)}
+.dep .when{font:900 44px/.85 var(--display);color:var(--ink)}
+.dep .when small{display:block;font-size:17px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin-top:4px}
+.dep h3{margin:0 0 4px;font-size:18px;line-height:1.3}
+.dep p{margin:0;color:var(--muted);font-size:14.5px}
+.dep .who{font-size:14px;color:var(--muted)}
+.dep .who b{display:block;color:var(--ink);font-weight:600}
+.stream{display:inline-block;font-size:12.5px;font-weight:700;margin-bottom:6px;color:var(--link)}
+.dep.tbc .when{color:var(--muted);font-size:30px}
+@media (max-width:860px){
+  .dep{grid-template-columns:76px minmax(0,1fr)}
+  .dep .when{font-size:36px}
+  .dep .who,.dep .act{grid-column:2}
+}
+.sessions-extra{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;margin-top:48px}
+@media (max-width:900px){.sessions-extra{grid-template-columns:1fr}}
+.pod{background:var(--quay);color:#fff;border-radius:16px;padding:28px;position:relative;overflow:hidden}
+.pod h3{font:800 44px/.95 var(--display);margin:0 0 6px}
+.pod .ep{color:var(--amber);font-weight:700;font-size:14px;margin:0 0 14px}
+.pod p{color:#c8d6eb;margin:0 0 16px;max-width:52ch}
+.pod ol{margin:0 0 20px;padding:0;list-style:none;display:grid;gap:8px}
+.pod li{display:grid;grid-template-columns:1fr auto;gap:12px;font-size:14.5px;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:8px}
+.pod li span{color:#a9bbd8}
+.pod .hosts{font-size:14px;color:#c8d6eb;margin:0 0 18px}
+.recs h3{font:800 32px/1 var(--display);margin:0 0 12px}
+.recs ul{list-style:none;margin:0;padding:0}
+.recs li{display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.recs li b{font-weight:600;line-height:1.35}
+.recs li small{display:block;color:var(--muted);font-size:13px;font-weight:400;margin-top:2px}
+.recs .more{margin-top:14px;color:var(--muted);font-size:14.5px}
+.recs details summary{cursor:pointer;color:var(--link);font-weight:700;font-size:14.5px;padding:12px 0}
+
+/* voices */
+.voices{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:84px;padding:64px 0}
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+@media (max-width:900px){.quotes{grid-template-columns:1fr;gap:28px}}
+.quote{margin:0;display:flex;flex-direction:column;gap:18px}
+.quote p{margin:0;font-size:17px;line-height:1.55}
+.quote p::before{content:"“";display:block;font:900 64px/.6 var(--display);color:var(--amber);margin-bottom:10px}
+.quote footer{display:flex;gap:12px;align-items:center;font-size:14px;color:var(--muted);margin-top:auto}
+.quote footer b{display:block;color:var(--ink)}
+.av{width:44px;height:44px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px}
+.av img{width:100%;height:100%;object-fit:cover}
+
+/* community */
+.community{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:start}
+@media (max-width:900px){.community{grid-template-columns:1fr}}
+.qotm{border-left:6px solid var(--amber);padding:4px 0 4px 22px;margin-bottom:34px}
+.qotm .k{font-size:14px;font-weight:700;color:var(--muted);margin:0 0 6px}
+.qotm h3{font:800 34px/1.02 var(--display);margin:0 0 12px}
+.qotm p{margin:0 0 16px;color:var(--muted)}
+.lina{display:flex;gap:16px;align-items:flex-start}
+.lina .face{width:72px;height:72px;border-radius:50%;background:var(--cyan);overflow:hidden;flex:none;display:grid;place-items:center;color:#fff;font-weight:700;font-size:22px}
+.lina .face img{width:100%;height:100%;object-fit:cover}
+.lina h3{margin:0;font-size:19px}
+.lina small{color:var(--muted);font-size:13.5px}
+.lina p{margin:10px 0 0;color:var(--muted);font-size:15px}
+.directory{margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.directory h3{font:800 28px/1 var(--display);margin:0 0 8px}
+.directory p{margin:0 0 14px;color:var(--muted);font-size:15px}
+
+/* forms */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px;display:grid;gap:16px}
+.form h3{font:800 30px/1 var(--display);margin:0}
+.form .intro{margin:-6px 0 0;color:var(--muted);font-size:14.5px}
+.form label{display:grid;gap:6px;font-size:14px;font-weight:600}
+.form input:not([type=checkbox]),.form select,.form textarea{border:1.5px solid var(--line);border-radius:8px;padding:11px 12px;background:var(--paper);font-weight:400;font-size:15px;width:100%}
+.form input:focus,.form select:focus,.form textarea:focus{outline:0;border-color:var(--cyan)}
+.form textarea{min-height:110px;resize:vertical}
+.form .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:560px){.form .row{grid-template-columns:1fr}}
+.form .hint{font-weight:400;color:var(--muted);font-size:13px}
+.form fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}
+.form legend{font-size:14px;font-weight:600;padding:0;margin-bottom:8px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.ck{display:inline-flex!important;align-items:center;gap:8px;font-weight:500!important;border:1.5px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:14px!important}
+.ck:has(input:checked){border-color:var(--blue);background:rgba(22,65,148,.08)}
+.ck input,.line input{accent-color:var(--blue);width:16px;height:16px;flex:none}
+.line{display:flex!important;align-items:flex-start;gap:10px;font-weight:500!important;font-size:14px!important}
+.line input{margin-top:3px}
+.consent{background:var(--paper);border-radius:10px;padding:14px;display:grid;gap:10px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.done{border-radius:16px;padding:26px;background:var(--surface);border:2px solid #2e9d62}
+.done h3{font:800 32px/1 var(--display);margin:0 0 8px;color:#1f7a4b}
+@media (prefers-color-scheme:dark){.done h3{color:#5fd39a}}
+.done p{margin:0 0 14px;color:var(--muted)}
+
+/* join */
+.join{background:var(--quay);color:#fff;margin-top:84px;padding:72px 0}
+.join h2{font:800 clamp(40px,5.4vw,66px)/.95 var(--display);margin:0 0 14px;max-width:16ch}
+.join .lead{color:#c8d6eb;max-width:56ch;margin:0 0 36px;font-size:17px}
+.path{list-style:none;margin:0 0 36px;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.path li{padding:18px 20px 0 0;border-top:2px solid rgba(255,255,255,.25);position:relative}
+.path li::before{content:"";position:absolute;top:-8px;left:0;width:14px;height:14px;border-radius:50%;background:var(--amber)}
+.path li.soon::before{background:transparent;border:2px solid var(--amber)}
+.path b{display:block;font:800 26px/1 var(--display);margin-bottom:6px}
+.path span{color:#c8d6eb;font-size:14.5px;display:block;max-width:30ch}
+@media (max-width:860px){.path{grid-template-columns:1fr 1fr;row-gap:28px}}
+@media (max-width:520px){.path{grid-template-columns:1fr}}
+
+/* footer */
+footer.site{background:#071f47;color:#a9bbd8;font-size:14.5px}
+footer.site .wrap{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding-top:44px;padding-bottom:44px}
+@media (max-width:860px){footer.site .wrap{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){footer.site .wrap{grid-template-columns:1fr}}
+footer.site h4{color:#fff;margin:0 0 10px;font-size:15px}
+footer.site ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+footer.site a{color:#fff}
+footer.site p{margin:0}
+.pilot{font-size:13px;color:#8aa0c4;border-top:1px solid rgba(255,255,255,.08)}
+.pilot .wrap{display:block;padding-top:16px;padding-bottom:20px}
+
+/* dialogs */
+dialog{border:0;padding:0;border-radius:16px;max-width:720px;width:calc(100% - 28px);max-height:calc(100% - 32px);background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(7,25,58,.6)}
+dialog[open]{animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.dlg-cv{aspect-ratio:21/7;overflow:hidden}
+.dlg-cv svg{width:100%;height:100%;display:block}
+.dlg{padding:24px 26px 28px;position:relative}
+.x{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-size:20px;line-height:1;z-index:2}
+.dlg h2{font:800 38px/1 var(--display);margin:0 0 8px;padding-right:44px}
+.dlg .sub{color:var(--muted);margin:0 0 16px;font-size:14.5px}
+.dlg h4{margin:20px 0 8px;font-size:15px}
+.dlg dl{margin:0;display:grid;gap:10px}
+.dlg dt{font-weight:700;font-size:14px;color:var(--coral)}
+.dlg dd{margin:2px 0 0;font-size:15px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted);margin:14px 0 0}
+.facts b{color:var(--ink);font-weight:600}
+.dlg .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+#proDlg .form{border:0;padding:0;background:none}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,140%);background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:999px;font-size:14.5px;z-index:100;transition:transform .25s;max-width:calc(100% - 28px)}
+.toast.on{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top" aria-label="CHIRON Knowledge Hub, back to top">
+      <span class="brand-mark"><img src="../assets/chiron-symbol.png" alt="" onerror="this.remove()"></span>
+      <span><b>CHIRON</b><small>Knowledge Hub</small></span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <a href="#method">Method</a>
+      <a href="#resources">Resources</a>
+      <a href="#sessions">Sessions</a>
+      <a href="#community">Community</a>
+    </nav>
+    <button class="btn btn-go btn-sm" data-profile>Create your profile</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="wrap hero-in">
+      <div>
+        <h1 id="heroTitle">The network of educators teaching with Port Virtual Lab</h1>
+        <p class="lead">Teachers of logistics, transport and international trade share what works in class, compare how their students decide, and build the method together.</p>
+        <div class="hero-actions">
+          <button class="btn btn-go" data-profile>Create your profile</button>
+          <a class="btn btn-line" href="#resources">Browse resources</a>
+        </div>
+        <div class="next" id="next"></div>
+      </div>
+      <div class="scene" aria-hidden="true" id="scene"></div>
+    </div>
+  </section>
+
+  <div class="licence">
+    <div class="wrap">
+      <span>Nothing to join: CHIRON comes with your centre’s Open Lab licence.</span>
+      <a href="https://www.pvl.one">What is Port Virtual Lab?</a>
+    </div>
+  </div>
+
+  <!-- METHOD -->
+  <section class="block" id="method" aria-labelledby="methodTitle">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="methodTitle">The CHIRON loop</h2>
+        <p>Five steps for any Port Virtual Lab scenario. The simulator gives the professional context; the class builds the learning around it. Pick a step to see the resources for it.</p>
+      </div>
+      <ol class="loop" id="loop"></ol>
+      <details class="case" id="case">
+        <summary>
+          <div><b>Build your first PVL case study</b><br><span>Eight decisions that turn a scenario into a class you can run again. Start from the learning objective, not the platform.</span></div>
+          <i><span class="o">Show the template</span><span class="c">Hide the template</span></i>
+        </summary>
+        <ol class="tpl" id="tpl"></ol>
+        <div class="tpl-foot">
+          <button class="btn btn-quiet btn-sm" data-request="I would like the one-page PVL case study template.">Get the one-page template</button>
+          <span>Episode 1 of PVL in Practice builds a case with it, step by step.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="block" id="resources" aria-labelledby="resTitle">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="resTitle">Resources</h2>
+        <p>Case studies, templates and short activities you can take into your next class.</p>
+      </div>
+      <div class="tools">
+        <label class="search"><span class="sr">Search resources</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="q" type="search" placeholder="Search: insurance, debrief, eCMR…">
+        </label>
+        <div class="chips" id="typeChips" role="group" aria-label="Type of resource"></div>
+        <label><span class="sr">PVL scenario</span><select id="scenarioSel"></select></label>
+      </div>
+      <p class="filter-note" id="filterNote" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+      <div class="share">
+        <span>Have an activity that works in your class?</span>
+        <button class="btn btn-quiet btn-sm" data-request="I would like to share a resource with the CHIRON network: ">Share it with the network</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SESSIONS -->
+  <section class="block" id="sessions" aria-labelledby="sesTitle">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="sesTitle">Next sessions</h2>
+        <p>Two live activities a month. Every session leaves a recording or a resource here.</p>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="sessions-extra">
+        <article class="pod">
+          <h3>PVL in Practice</h3>
+          <p class="ep">Episode 1: How to build your first PVL case study</p>
+          <p>A 20 to 25 minute video podcast. We build an activity together with real cases from recent courses, and you leave with something to use the next day.</p>
+          <ol id="podFormat"></ol>
+          <p class="hosts">With Mar, Orlando and Valeria. In English, subtitled when a guest speaks another language.</p>
+          <button class="btn btn-go btn-sm" data-request="Question or topic for PVL in Practice: ">Suggest a topic</button>
+        </article>
+        <div class="recs">
+          <h3>Recordings</h3>
+          <ul id="recList"></ul>
+          <details>
+            <summary>Coming next in PVL in Practice</summary>
+            <ul id="nextEps"></ul>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOICES -->
+  <section class="voices" aria-labelledby="voicesTitle">
+    <div class="wrap">
+      <div class="head"><h2 id="voicesTitle">What teachers say</h2><p>Three classrooms, three countries. From the interviews in the PVL magazine.</p></div>
+      <div class="quotes" id="quotes"></div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="block" id="community" aria-labelledby="comTitle">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="comTitle">Ask the network</h2>
+        <p>Questions, cases you want to share, help adapting PVL to your course. The CHIRON team reads every message and answers within two working days.</p>
+      </div>
+      <div class="community">
+        <div>
+          <div class="qotm">
+            <p class="k">Question of the month</p>
+            <h3 id="qotmTitle">How do you debrief a group that made a bad decision without killing their motivation?</h3>
+            <p>Tell us what you say, and what you avoid saying. The best answers are shared in PVL in Practice.</p>
+            <button class="btn btn-quiet btn-sm" id="answerQotm">Send your answer</button>
+          </div>
+          <div class="lina">
+            <div class="face"><img src="../assets/lina.jpg" alt="" onerror="this.parentNode.textContent='LC'"></div>
+            <div>
+              <h3>Lina Costa</h3>
+              <small>CHIRON Programme Collaborator, virtual assistant</small>
+              <p>Lina is the bridge between the Port Virtual Lab team and the teachers who use it. Behind her, the CHIRON team at the Escola reads and answers every message.</p>
+            </div>
+          </div>
+          <div class="directory">
+            <h3>Find a teacher</h3>
+            <p>Soon you will be able to find teachers who know a scenario well and are happy to help. To appear, create your profile and tick “Show my profile”. Your email is never shown.</p>
+            <button class="btn btn-quiet btn-sm" data-profile>Create your profile</button>
+          </div>
+        </div>
+        <div id="supportBox">
+          <form class="form" id="supportForm">
+            <h3>Write to the CHIRON team</h3>
+            <p class="intro">Tell us about your centre and your course.</p>
+            <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <div class="row">
+              <label>Your name<input required name="name" autocomplete="name"></label>
+              <label>Email<input required type="email" name="email" autocomplete="email"></label>
+            </div>
+            <div class="row">
+              <label>Training centre<input required name="centre" placeholder="Centre, city" autocomplete="organization"></label>
+              <label>Programme or course <span class="hint">Optional</span><input name="course" placeholder="e.g. CFGS Transport i Logística"></label>
+            </div>
+            <label>What do you need?
+              <textarea required name="need" id="needField" placeholder="e.g. I have four 90-minute sessions on cargo insurance and want students to compare decisions, not just fill in forms."></textarea>
+            </label>
+            <div class="row">
+              <label>PVL scenario<select name="scenario" id="supScenario"></select></label>
+              <label>Reply in<select name="lang"><option>English</option><option>Español</option><option>Català</option><option>Italiano</option><option>Português</option><option>Français</option></select></label>
+            </div>
+            <label class="line"><input type="checkbox" required name="privacy"><span>I have read the <a href="https://escolaeuropea.eu/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</span></label>
+            <div><button class="btn btn-go" type="submit">Send message</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN -->
+  <section class="join" aria-labelledby="joinTitle">
+    <div class="wrap">
+      <h2 id="joinTitle">Make your practice visible</h2>
+      <p class="lead">This year we are piloting a pathway so that what you do with PVL is seen and, step by step, recognised. It starts with your profile.</p>
+      <ol class="path" id="path"></ol>
+      <button class="btn btn-go" data-profile>Create your profile</button>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div><h4>CHIRON</h4><p>The network of educators teaching with Port Virtual Lab, run by Escola Europea – Intermodal Transport. Part of <a href="https://www.pvl.one">pvl.one</a>.</p></div>
+    <div><h4>Contact</h4><ul><li><a href="mailto:teachers@escolaeuropea.eu">teachers@escolaeuropea.eu</a></li><li>Terminal Drassanes, Jardins de l’Areté</li><li>08039 Barcelona</li></ul></div>
+    <div><h4>Family</h4><ul><li><a href="https://www.pvl.one">pvl.one</a></li><li><a href="https://escolaeuropea.eu">escolaeuropea.eu</a></li><li><a href="https://chiron.escolaeuropea.eu/">chiron.escolaeuropea.eu</a></li></ul></div>
+    <div><h4>Legal</h4><ul><li><a href="https://escolaeuropea.eu/privacy-policy/">Privacy policy</a></li><li><a href="https://escolaeuropea.eu/legal-notice/">Legal notice</a></li></ul></div>
+  </div>
+  <div class="pilot"><div class="wrap">Pilot version. The resource library is being filled with materials from the network; some cards describe resources in preparation.</div></div>
+</footer>
+
+<!-- Resource dialog -->
+<dialog id="resDlg" aria-labelledby="resDlgTitle"></dialog>
+
+<!-- Profile dialog -->
+<dialog id="proDlg" aria-labelledby="proTitle">
+  <div class="dlg">
+    <button class="x" data-close aria-label="Close">×</button>
+    <div id="proBox">
+      <form class="form" id="proForm">
+        <h2 id="proTitle" style="font:800 38px/1 var(--display);margin:0;padding-right:44px">Create your profile</h2>
+        <p class="intro">So we send you what fits your teaching, not the same webinar as everyone else.</p>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="row">
+          <label>Your name<input required name="name" autocomplete="name"></label>
+          <label>Email<input required type="email" name="email" autocomplete="email"></label>
+        </div>
+        <div class="row">
+          <label>Centre or company<input required name="centre" autocomplete="organization" placeholder="e.g. CIFP Plaiaundi"></label>
+          <label>Country<input required name="country" autocomplete="country-name"></label>
+        </div>
+        <div class="row">
+          <label>You are a<select name="role"><option>Teacher</option><option>Trainer</option></select></label>
+          <label>Where you teach<select name="inst"><option>Vocational training (VET)</option><option>University</option><option>Professional / in-company training</option></select></label>
+        </div>
+        <fieldset>
+          <legend>What you teach</legend>
+          <div class="checks">
+            <label class="ck"><input type="checkbox" name="area" value="Import">Import</label>
+            <label class="ck"><input type="checkbox" name="area" value="Export">Export</label>
+            <label class="ck"><input type="checkbox" name="area" value="Customs">Customs</label>
+            <label class="ck"><input type="checkbox" name="area" value="Maritime">Maritime</label>
+            <label class="ck"><input type="checkbox" name="area" value="Air">Air</label>
+            <label class="ck"><input type="checkbox" name="area" value="Road">Road</label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>You and PVL</legend>
+          <div class="checks">
+            <label class="ck"><input type="checkbox" name="pvl" value="Open Lab">My centre has an Open Lab licence</label>
+            <label class="ck"><input type="checkbox" name="pvl" value="ToT completed">I completed the Training of Trainers</label>
+            <label class="ck"><input type="checkbox" name="pvl" value="Active PVL user">I use PVL with students this year</label>
+          </div>
+        </fieldset>
+        <label>Topics you want to explore <span class="hint">Optional</span><input name="interests" placeholder="e.g. cargo insurance, assessment, eCMR"></label>
+        <div class="consent">
+          <label class="line"><input type="checkbox" name="dir"><span>Show my profile in Find a teacher (name, centre, country and topics; never my email)</span></label>
+          <label class="line"><input type="checkbox" name="news"><span>Email me the monthly programme and resources that match my profile</span></label>
+          <label class="line"><input type="checkbox" name="privacy" required><span>I have read the <a href="https://escolaeuropea.eu/privacy-policy/" target="_blank" rel="noopener">privacy policy</a></span></label>
+        </div>
+        <div><button class="btn btn-go" type="submit">Save my profile</button></div>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ======================================================================
+   DATA — edit freely
+   ====================================================================== */
+const CONTACT_EMAIL = 'teachers@escolaeuropea.eu';
+const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwEemCn7_Ap-0O1F-hSqfQgz6KsuD-zFxQ79gN8-YlgGpwr8AbPQj5dVLn-mGp3UXnelA/exec';
+
+const STEPS = [
+  {k:'analyse',  t:'Analyse',  d:'Students read the operation and identify what is at stake.'},
+  {k:'decide',   t:'Decide',   d:'Each group commits to a decision before running the simulator.'},
+  {k:'simulate', t:'Simulate', d:'PVL plays the decision out in a realistic professional scenario.'},
+  {k:'justify',  t:'Justify',  d:'Groups explain their choice and the evidence behind it.'},
+  {k:'reflect',  t:'Reflect',  d:'The class compares decisions. The comparison is the lesson.'}
+];
+const SCENARIOS = ['TT Circle','SDG Lines','SDG Airlines','DeCA Lab','Click & Cargo','Dispatcher PRO','PVL Game'];
+const TYPES = ['Case study','Activity','Template','Try it tomorrow'];
+const STREAMS = {port:'Port Logistics & Innovation', lab:'Learning & Teaching Lab', studio:'PVL Studio'};
+
+const CASE_TPL = [
+  {t:'Learning objective', d:'What students can do at the end. One sentence you can observe.'},
+  {t:'What students receive', d:'The brief, documents and data they start with. What you give, and what you hold back.'},
+  {t:'What they research', d:'What they look up themselves before deciding.'},
+  {t:'Decisions they take', d:'Route, mode, provider, quotation, Incoterm, insurance. Each group commits and records it.'},
+  {t:'When you step in', d:'Planned moments to observe, ask or add new information. Not to give answers.'},
+  {t:'When a decision goes wrong', d:'Let the simulator show the consequence. Students rebuild their reasoning instead of being corrected.', key:true},
+  {t:'The debrief', d:'What did you decide, why, with what information? What would you change now?'},
+  {t:'Assessment', d:'How you grade the decision, the justification and the reflection.'}
+];
+
+const POD_FORMAT = [['What’s happening in PVL','3 min'],['Question of the month','2 min'],['Let’s build it together','12–15 min'],['Add one more layer','3 min'],['Try it tomorrow','2 min']];
+const NEXT_EPISODES = [
+  'How to run a good debrief after a simulation',
+  'What happens when students make the wrong decision?',
+  'How to use teamwork effectively in PVL',
+  'How to introduce TT Circle into a case study',
+  'How to assess students during a simulation',
+  'How to turn a simple operation into a multimodal case',
+  'How much information should students receive?',
+  'How to use quotations as a learning activity'
+];
+const PATHWAY = [
+  {t:'Member', d:'Takes part in the programme and uses its resources. Every teacher at an Open Lab centre.'},
+  {t:'Practitioner', d:'Applies PVL in their own teaching practice.'},
+  {t:'Ambassador', d:'Shares their experience and supports other teachers.'},
+  {t:'Certified Educator', d:'A recognised pathway we are exploring for the next stage.', soon:true}
+];
+
+/* Resource library. status:'prep' = described, files being prepared (button asks the team). */
+const RESOURCES = [
+  {id:'r11', title:'One-page PVL case study template', type:'Template', scenario:'All scenarios', langs:['EN','ES'], steps:['analyse','decide','reflect'], duration:'15 min to fill in',
+   summary:'The challenge from PVL in Practice, episode 1. Define only five things: learning objective, cargo or operation, information provided, one decision students must make and one question for the debrief.'},
+  {id:'r1', title:'TT Circle in the classroom', type:'Case study', scenario:'TT Circle', langs:['EN','ES'], steps:['analyse','decide','simulate','justify','reflect'], duration:'8 min read',
+   summary:'Cargo insurance as a decision problem. The first documented run of the CHIRON loop: what students decided, how the simulator played it out and what the comparison between groups taught.'},
+  {id:'r2', title:'Insuring a container from Shanghai to Barcelona', type:'Case study', scenario:'TT Circle', langs:['EN','ES','CA'], steps:['analyse','decide','simulate','justify','reflect'], duration:'2 × 90 min',
+   summary:'Groups choose coverage (ICC A, B or C), sum insured and deductible for a consumer-electronics shipment, then face a claim in the simulator.',
+   tpl:['Choose and justify cargo insurance cover for a real shipment.','Commercial invoice, Incoterm (CIF Barcelona) and the shipment file in TT Circle.','What ICC A, B and C cover and typical deductibles.','Cover, sum insured and deductible, recorded on the decision sheet.','After the decision sheet, before running the simulator.','An uncovered claim appears in the simulator. Groups trace which decision caused it.','Groups compare premiums paid against losses recovered.','Reflection rubric: decision, evidence, justification, learning.']},
+  {id:'r12', title:'Dispatcher PRO as a decision activity', type:'Activity', scenario:'Dispatcher PRO', langs:['EN','ES'], steps:['analyse','decide','simulate','justify'], duration:'90 min',
+   summary:'What students decide when they dispatch a fleet, when the teacher steps in and how to debrief the plan against what actually happened.'},
+  {id:'r3', title:'Decision sheet: Incoterms and who insures', type:'Template', scenario:'TT Circle', langs:['EN','ES','CA','IT'], steps:['decide','justify'], duration:'15 min',
+   summary:'A one-page sheet each group fills in before running the simulator. It forces a committed decision and records the evidence they will need to justify it.'},
+  {id:'r4', title:'Choosing a route during a port strike', type:'Activity', scenario:'SDG Lines', langs:['EN','IT'], steps:['analyse','decide','simulate'], duration:'90 min',
+   summary:'A strike closes the planned port of discharge. Students compare rerouting, waiting and transhipment on cost, time and emissions, then run the voyage in SDG Lines.'},
+  {id:'r5', title:'Quoting air freight with chargeable weight', type:'Activity', scenario:'SDG Airlines', langs:['EN','ES'], steps:['analyse','simulate','justify'], duration:'60 min',
+   summary:'From volumetric weight to the final quotation. A guided activity for students new to air cargo, with three shipments of increasing difficulty.'},
+  {id:'r6', title:'An eCMR walkthrough with DeCA Lab', type:'Activity', scenario:'DeCA Lab', langs:['EN','ES','PT'], steps:['analyse','simulate','reflect'], duration:'2 × 60 min',
+   summary:'Students issue, sign and amend a digital consignment note, then compare it with the paper CMR. Ends with a discussion on what changes for carrier and shipper.'},
+  {id:'r7', title:'Reflection rubric for the CHIRON loop', type:'Template', scenario:'All scenarios', langs:['EN','ES','CA','IT','PT'], steps:['justify','reflect'], duration:'Any session',
+   summary:'Four criteria to assess how groups justify a decision and what they learn from comparing it with other groups. Works with any PVL scenario.'},
+  {id:'r9', title:'Peer review grid for group decisions', type:'Template', scenario:'All scenarios', langs:['EN','ES'], steps:['justify','reflect'], duration:'20 min',
+   summary:'Groups review another group’s decision with three questions, turning the reflect step into structured feedback.'},
+  {id:'r10', title:'Who pays the freight? A ten-minute warm-up', type:'Try it tomorrow', scenario:'All scenarios', langs:['EN','ES','CA'], steps:['decide','justify'], duration:'10 min',
+   summary:'Put three Incoterms on the board. Each group has two minutes to commit to who pays freight and insurance, then defends it. No setup, no login.'}
+];
+
+/* Sessions: CHIRON plan Sep–Dec 2026. Past/upcoming is worked out from today. Put the recording link in video. */
+const EVENTS = [
+  {id:'e1', date:'2026-09-17', title:'Insurance Module: applying cargo insurance in PVL scenarios', stream:'lab', hosts:'CHIRON team', summary:'Cargo insurance in PVL scenarios, risk management and decision-making.', video:''},
+  {id:'e2', date:'2026-09-25', title:'Dispatcher PRO: practical use for new centres', stream:'studio', hosts:'CHIRON team', summary:'A practical introduction to Dispatcher PRO for new centres and trainers.', video:''},
+  {id:'e3', date:'2026-10-13', title:'Negotiation Module: role-play, decision-making and classroom use', stream:'lab', hosts:'CHIRON team', summary:'Role-play, active learning and classroom assessment with the Negotiation Module.', video:''},
+  {id:'e4', date:'2026-10-22', title:'H1 and railway documentation: refresher workshop', stream:'studio', hosts:'CHIRON team', summary:'H1 and railway documentation within PVL activities.', video:''},
+  {id:'e5', date:'2026-10-22', title:'PVL in Practice, episode 1: How to build your first PVL case study', stream:'lab', hosts:'Mar, Orlando and Valeria', summary:'Building a case together with the eight-step template.', video:''},
+  {id:'e6', date:'2026-10-29', time:'16:00', title:'Dispatcher in class: the pedagogical side', stream:'lab', hosts:'Led by Mar', summary:'Turning Dispatcher into a decision activity, and how to debrief it.', video:''},
+  {id:'e7', date:'2026-11-19', title:'PVL Game: activating learning through simulation and challenge-based dynamics', stream:'lab', hosts:'CHIRON team', summary:'PVL Game methodology, teamwork, simulation and challenge-based learning.'},
+  {id:'e8', date:'2026-11-26', title:'Click & Cargo Academy and ERP foundations', stream:'studio', hosts:'CHIRON team', summary:'Click & Cargo Academy and how it fits within PVL and Open Lab.'},
+  {id:'e9', date:'2026-11-30', end:'2026-12-02', title:'Training of Trainers', stream:'studio', hosts:'CHIRON team', summary:'Three days to run the CHIRON loop with confidence and train other teachers at your centre.'},
+  {id:'e10', date:'2026-12-10', title:'CHIRON year review and teachers’ needs session', stream:'port', hosts:'CHIRON team', summary:'What we did in 2026, new resources, and your priorities for 2027.'},
+  {id:'e11', date:null, title:'AI for logistics educators', stream:'port', hosts:'Industry guests', summary:'AI-supported teaching for logistics. Date to be confirmed.'}
+];
+const EXTRA_RECORDINGS = [{id:'v1', title:'Your first week with Open Lab', label:'Onboarding', video:''}];
+
+const QUOTES = [
+  {name:'Marisa Clavero', where:'Institut eCAT Lluïsa Cura, Barcelona', img:'../assets/marisa-clavero.jpg', color:'#164194',
+   text:'Students gain a better understanding of logistics processes while developing essential skills such as decision-making and problem-solving. PVL plays a crucial role in preparing students for the job market.'},
+  {name:'Elwyn Pitt', where:'Occupational Training Center, Johannesburg', img:'../assets/elwyn-pitt.jpg', color:'#e84e1b',
+   text:'The programme has significantly improved students’ employability, enabling some to secure permanent positions even while still undergoing their six-month workplace experiential learning programme.'},
+  {name:'Hilda Ghiara', where:'Università di Genova, EMMP Masters programme', img:'../assets/hilda-ghiara.jpg', color:'#009fe3',
+   text:'The key advantage of PVL is that it transforms theoretical concepts into practical applications. It helps bridge the gap between academic learning and professional practice.'}
+];
+
+/* ======================================================================
+   HELPERS
+   ====================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+const parseD = s => { if (!s) return null; const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const isPast = ev => { const e = parseD(ev.end || ev.date); return e ? e < TODAY : false; };
+const longDate = ev => { const d = parseD(ev.date); if (!d) return 'Date to be confirmed';
+  if (ev.end){ const e = parseD(ev.end); return `${d.getDate()} ${MONTH[d.getMonth()]} to ${e.getDate()} ${MONTH[e.getMonth()]} ${e.getFullYear()}`; }
+  return `${d.getDate()} ${MONTH[d.getMonth()]} ${d.getFullYear()}${ev.time ? ', '+ev.time+' CET' : ''}`; };
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 3200); }
+
+/* ======================================================================
+   HERO SCENE (crane loading the five loop steps)
+   ====================================================================== */
+function renderScene(){
+  const cols = ['#f9b233','#f39c33','#e84e1b','#009fe3','#2f6fd0'];
+  let boxes = '';
+  STEPS.forEach((s,i) => {
+    const x = 62 + i*100;
+    boxes += `<g class="box" style="animation-delay:${.35 + i*.16}s"><rect x="${x}" y="300" width="96" height="58" rx="2" fill="${cols[i]}"/>`;
+    for (let k=1;k<7;k++) boxes += `<line x1="${x+k*13.7}" y1="304" x2="${x+k*13.7}" y2="354" stroke="rgba(11,45,99,.18)" stroke-width="2"/>`;
+    boxes += `<text x="${x+48}" y="337" text-anchor="middle" font-family="Big Shoulders Display,Impact,sans-serif" font-weight="800" font-size="21" fill="#0b2d63">${s.t}</text></g>`;
+  });
+  $('#scene').innerHTML = `<svg viewBox="0 0 620 470" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#163d7a">
+      <rect x="0" y="236" width="40" height="64"/><rect x="44" y="214" width="26" height="86"/><rect x="560" y="226" width="60" height="74"/>
+    </g>
+    <g stroke="#f9b233" stroke-width="6" fill="none" stroke-linecap="square">
+      <path d="M455 300V70M520 300V70M455 120h65M455 70h65M455 70L520 120M520 70L455 120"/>
+      <path d="M180 70H600"/><path d="M180 92H600"/>
+      <path d="M520 70L600 30M455 70L520 30L600 30"/>
+    </g>
+    <g class="spreader">
+      <rect x="300" y="92" width="34" height="18" fill="#f9b233"/>
+      <path d="M309 110v120M325 110v120" stroke="#f9b233" stroke-width="2.5"/>
+      <rect x="280" y="226" width="74" height="10" fill="#f9b233"/>
+    </g>
+    <path d="M30 358h570l-34 54H70z" fill="#071f47"/>
+    <rect x="30" y="358" width="570" height="8" fill="#e84e1b"/>
+    ${boxes}
+    <path d="M0 420q26-10 52 0t52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0V470H0z" fill="#009fe3" opacity=".28"/>
+    <path d="M0 440q26-8 52 0t52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0 52 0V470H0z" fill="#009fe3" opacity=".22"/>
+  </svg>`;
+}
+
+/* ======================================================================
+   NEXT SESSION (hero) + SESSIONS BOARD
+   ====================================================================== */
+const upcoming = () => EVENTS.filter(e => !isPast(e)).sort((a,b) => (a.date||'9999').localeCompare(b.date||'9999'));
+function renderNext(){
+  const ev = upcoming().find(e => e.date);
+  if (!ev){ $('#next').innerHTML = ''; return; }
+  const d = parseD(ev.date);
+  $('#next').innerHTML = `<div class="next-date">${d.getDate()}<span>${MON[d.getMonth()]}</span></div>
+    <span class="next-kicker">Next session</span>
+    <span class="next-title">${esc(ev.title)}</span>
+    <span class="next-act"><button data-ics="${ev.id}">Add to my calendar</button></span>`;
+}
+function renderBoard(){
+  const list = upcoming();
+  $('#board').innerHTML = list.map(ev => {
+    const d = parseD(ev.date), e = ev.end ? parseD(ev.end) : null;
+    const when = d ? `${d.getDate()}${e ? '–'+e.getDate() : ''}<small>${MON[(e||d).getMonth()]}</small>` : `Soon<small>Date TBC</small>`;
+    return `<article class="dep ${d?'':'tbc'}">
+      <div class="when">${when}</div>
+      <div><span class="stream">${STREAMS[ev.stream]}</span><h3>${esc(ev.title)}</h3><p>${esc(ev.summary)}</p></div>
+      <div class="who"><b>${esc(ev.hosts)}</b>${esc(longDate(ev))}</div>
+      <div class="act">${d ? `<button class="btn btn-quiet btn-sm" data-ics="${ev.id}">Add to calendar</button>` : `<button class="btn btn-quiet btn-sm" data-profile>Tell me when</button>`}</div>
+    </article>`;
+  }).join('') || `<div class="empty"><b>The next programme is being prepared</b>Create your profile and we will send it to you.</div>`;
+
+  const past = EVENTS.filter(isPast).sort((a,b) => b.date.localeCompare(a.date)).map(e => ({...e, label:longDate(e)})).concat(EXTRA_RECORDINGS);
+  $('#recList').innerHTML = past.map(v => `<li><b>${esc(v.title)}<small>${esc(v.label)}</small></b>
+    ${v.video ? `<a class="btn btn-quiet btn-sm" href="${esc(v.video)}" target="_blank" rel="noopener">Watch</a>` : `<button class="btn btn-quiet btn-sm" data-request="I would like access to the recording: ${esc(v.title)}">Request</button>`}</li>`).join('');
+  $('#podFormat').innerHTML = POD_FORMAT.map(([t,m]) => `<li>${t}<span>${m}</span></li>`).join('');
+  $('#nextEps').innerHTML = NEXT_EPISODES.map(t => `<li><b>${esc(t)}</b><span></span></li>`).join('');
+}
+
+/* .ics download: a real calendar entry */
+function downloadIcs(id){
+  const ev = EVENTS.find(e => e.id === id); if (!ev || !ev.date) return;
+  const d = parseD(ev.date), pad = n => String(n).padStart(2,'0');
+  const ymd = x => `${x.getFullYear()}${pad(x.getMonth()+1)}${pad(x.getDate())}`;
+  let start, end;
+  if (ev.time){ const [h,m] = ev.time.split(':'); start = `DTSTART;TZID=Europe/Madrid:${ymd(d)}T${h}${m}00`; end = `DTEND;TZID=Europe/Madrid:${ymd(d)}T${pad(+h+1)}${m}00`; }
+  else { const e = parseD(ev.end || ev.date); e.setDate(e.getDate()+1); start = `DTSTART;VALUE=DATE:${ymd(d)}`; end = `DTEND;VALUE=DATE:${ymd(e)}`; }
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//CHIRON//Knowledge Hub//EN','BEGIN:VEVENT',
+    `UID:${ev.id}@chiron.escolaeuropea.eu`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').split('.')[0]}Z`, start, end,
+    `SUMMARY:CHIRON: ${ev.title.replace(/[,;]/g,'\\$&')}`, `DESCRIPTION:${ev.summary.replace(/[,;]/g,'\\$&')} The link to join is sent to CHIRON members by email.`,
+    'URL:https://chiron.escolaeuropea.eu/hub/','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
+  a.download = `chiron-${ev.id}.ics`; a.click(); URL.revokeObjectURL(a.href);
+  toast('Calendar file downloaded. Open it to add the session.');
+}
+
+/* ======================================================================
+   METHOD + RESOURCES
+   ====================================================================== */
+const F = {step:null, type:null, scenario:'', q:''};
+function matches(r){
+  if (F.step && !r.steps.includes(F.step)) return false;
+  if (F.type && r.type !== F.type) return false;
+  if (F.scenario && r.scenario !== F.scenario && r.scenario !== 'All scenarios') return false;
+  if (F.q){ const hay = (r.title+' '+r.summary+' '+r.scenario+' '+r.type).toLowerCase(); if (!F.q.toLowerCase().split(/\s+/).every(w => hay.includes(w))) return false; }
+  return true;
+}
+function renderLoop(){
+  $('#loop').innerHTML = STEPS.map((s,i) => {
+    const n = RESOURCES.filter(r => r.steps.includes(s.k)).length;
+    return `<li><button data-step="${s.k}" aria-pressed="${F.step===s.k}"><span class="n">${i+1}</span><span class="t">${s.t}</span><span class="d">${s.d}</span><span class="c">${n} resources</span></button></li>`;
+  }).join('');
+  $('#tpl').innerHTML = CASE_TPL.map((s,i) => `<li class="${s.key?'key':''}"><span class="k">${i+1}</span><b>${s.t}</b><p>${s.d}</p></li>`).join('');
+}
+$('#loop').addEventListener('click', e => {
+  const b = e.target.closest('[data-step]'); if (!b) return;
+  F.step = F.step === b.dataset.step ? null : b.dataset.step;
+  renderLoop(); renderResources();
+  if (F.step) $('#resources').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
+});
+
+function cover(scenario, i){
+  const pal = ['#f9b233','#e84e1b','#009fe3','#2f6fd0','#f39c33'];
+  const bg = {'TT Circle':'#0b2d63','SDG Lines':'#164194','SDG Airlines':'#0a6ea3','DeCA Lab':'#7a4a00','Click & Cargo':'#9e2f0a','Dispatcher PRO':'#1f4f8f','PVL Game':'#0b2d63'}[scenario] || '#0b2d63';
+  let s = `<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="320" height="160" fill="${bg}"/>`;
+  const rows = 2 + (i % 2), cols = 4 + (i % 3);
+  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+    if ((r*7 + c*3 + i) % 5 === 0) continue;
+    const x = 26 + c*44, y = 112 - r*26;
+    s += `<rect x="${x}" y="${y}" width="41" height="23" rx="1.5" fill="${pal[(r+c+i)%5]}"/><path d="M${x+10} ${y+4}v15M${x+20} ${y+4}v15M${x+30} ${y+4}v15" stroke="rgba(0,0,0,.15)" stroke-width="2"/>`;
+  }
+  s += `<path d="M0 138h320v22H0z" fill="rgba(255,255,255,.08)"/>`;
+  s += `<text x="300" y="34" text-anchor="end" font-family="Big Shoulders Display,Impact,sans-serif" font-weight="800" font-size="22" fill="rgba(255,255,255,.85)">${esc(scenario)}</text></svg>`;
+  return s;
+}
+function renderFilters(){
+  $('#typeChips').innerHTML = TYPES.map(t => `<button class="chip" data-type="${t}" aria-pressed="${F.type===t}">${t}</button>`).join('');
+  const opts = '<option value="">All scenarios</option>' + SCENARIOS.map(s => `<option ${F.scenario===s?'selected':''}>${s}</option>`).join('');
+  $('#scenarioSel').innerHTML = opts;
+  $('#supScenario').innerHTML = '<option>Not sure yet</option>' + SCENARIOS.map(s => `<option>${s}</option>`).join('');
+}
+function renderResources(){
+  const list = RESOURCES.filter(matches);
+  const parts = [];
+  if (F.step) parts.push(`for the ${STEPS.find(s=>s.k===F.step).t} step`);
+  if (F.type) parts.push(F.type.toLowerCase());
+  if (F.scenario) parts.push(F.scenario);
+  if (F.q) parts.push(`“${esc(F.q)}”`);
+  $('#filterNote').innerHTML = parts.length ? `${list.length} resource${list.length===1?'':'s'} ${parts.join(', ')}. <button id="clearF">Show all</button>` : '';
+  $('#grid').innerHTML = list.map((r,i) => `<button class="res" data-res="${r.id}">
+      <div class="cv">${cover(r.scenario, RESOURCES.indexOf(r))}</div>
+      <div class="body"><span class="kind">${r.type}</span><h3>${esc(r.title)}</h3><p>${esc(r.summary)}</p>
+        <div class="foot"><span>${esc(r.duration)}</span><span class="steps" title="Loop steps covered">${STEPS.map(s => `<i class="${r.steps.includes(s.k)?'on':''}"></i>`).join('')}</span></div>
+      </div></button>`).join('') ||
+    `<div class="empty"><b>Nothing here yet</b>Remove a filter, or ask the team: someone in the network may have just what you need.<div style="margin-top:14px"><button class="btn btn-quiet btn-sm" data-request="I am looking for a resource about: ${esc(F.q || F.scenario || '')}">Ask the team</button></div></div>`;
+}
+$('#typeChips').addEventListener('click', e => { const b = e.target.closest('[data-type]'); if (!b) return; F.type = F.type === b.dataset.type ? null : b.dataset.type; renderFilters(); renderResources(); });
+$('#scenarioSel').addEventListener('change', e => { F.scenario = e.target.value; renderResources(); });
+$('#q').addEventListener('input', e => { F.q = e.target.value.trim(); renderResources(); });
+$('#filterNote').addEventListener('click', e => { if (e.target.id !== 'clearF') return; Object.assign(F, {step:null,type:null,scenario:'',q:''}); $('#q').value=''; renderLoop(); renderFilters(); renderResources(); });
+$('#grid').addEventListener('click', e => { const c = e.target.closest('[data-res]'); if (c) openResource(c.dataset.res); });
+
+function openResource(id){
+  const r = RESOURCES.find(x => x.id === id); if (!r) return;
+  const dlg = $('#resDlg');
+  dlg.innerHTML = `<div class="dlg-cv">${cover(r.scenario, RESOURCES.indexOf(r))}</div>
+    <div class="dlg"><button class="x" data-close aria-label="Close">×</button>
+      <h2 id="resDlgTitle">${esc(r.title)}</h2>
+      <p class="sub">${r.type} for ${esc(r.scenario)}</p>
+      <p>${esc(r.summary)}</p>
+      ${r.tpl ? `<h4>How the case is built</h4><dl>${r.tpl.map((t,i) => `<div><dt>${i+1}. ${CASE_TPL[i].t}</dt><dd>${esc(t)}</dd></div>`).join('')}</dl>` : ''}
+      <div class="facts"><span>Duration <b>${esc(r.duration)}</b></span><span>Languages <b>${r.langs.join(', ')}</b></span><span>Loop steps <b>${STEPS.filter(s=>r.steps.includes(s.k)).map(s=>s.t).join(', ')}</b></span></div>
+      <div class="acts">
+        <button class="btn btn-go" data-request="I would like to receive the resource “${esc(r.title)}”.">Ask for this resource</button>
+        <button class="btn btn-quiet" data-close>Close</button>
+      </div>
+    </div>`;
+  dlg.showModal();
+}
+$('#resDlg').addEventListener('click', e => { if (e.target === $('#resDlg') || e.target.closest('[data-close]')) $('#resDlg').close(); });
+
+/* ======================================================================
+   VOICES, PATHWAY
+   ====================================================================== */
+function renderStatic(){
+  $('#quotes').innerHTML = QUOTES.map(q => `<blockquote class="quote"><p>${esc(q.text)}</p>
+    <footer><span class="av" style="background:${q.color}"><img src="${q.img}" alt="" onerror="this.parentNode.textContent='${q.name.split(' ').map(w=>w[0]).join('')}'"></span><span><b>${esc(q.name)}</b>${esc(q.where)}</span></footer></blockquote>`).join('');
+  $('#path').innerHTML = PATHWAY.map(p => `<li class="${p.soon?'soon':''}"><b>${p.t}</b><span>${p.d}</span></li>`).join('');
+}
+
+/* ======================================================================
+   FORMS → CLIENTIFY (Apps Script bridge)
+   ====================================================================== */
+async function sendToHub(form, fd){
+  const d = {form};
+  for (const [k,v] of fd.entries()){ if (k in d) d[k] = [].concat(d[k], v); else d[k] = v; }
+  ['area','pvl'].forEach(k => { if (d[k] !== undefined) d[k] = [].concat(d[k]); });
+  if (!FORM_ENDPOINT) return {ok:true, demo:true};
+  const res = await fetch(FORM_ENDPOINT, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(d)});
+  const out = await res.json().catch(() => ({ok:false, error:'bad response'}));
+  if (!out.ok) throw new Error(out.error || 'send failed');
+  return out;
+}
+async function submitWith(btn, label, fn){
+  btn.disabled = true; const old = btn.textContent; btn.textContent = label;
+  try { await fn(); return true; }
+  catch(err){ toast('We could not send it. Please try again or write to ' + CONTACT_EMAIL); return false; }
+  finally { btn.disabled = false; btn.textContent = old; }
+}
+
+/* Profile */
+function openProfile(){ $('#proDlg').showModal(); }
+document.addEventListener('click', e => { if (e.target.closest('[data-profile]')){ e.preventDefault(); closeMenu(); openProfile(); } });
+$('#proDlg').addEventListener('click', e => { if (e.target === $('#proDlg') || e.target.closest('[data-close]')) $('#proDlg').close(); });
+$('#proForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const ok = await submitWith(e.target.querySelector('[type=submit]'), 'Saving…', () => sendToHub('profile', fd));
+  if (!ok) return;
+  const first = String(fd.get('name')).split(' ')[0];
+  $('#proBox').innerHTML = `<div class="done" style="border:0;padding:0"><h3>Welcome to CHIRON, ${esc(first)}</h3>
+    <p>Your profile is saved. We will send you the sessions and resources that match what you teach.</p>
+    <button class="btn btn-go" data-close>Explore the hub</button></div>`;
+  document.querySelectorAll('.top [data-profile]').forEach(b => b.textContent = 'Profile saved');
+});
+
+/* Support form + prefilled requests from anywhere on the page */
+function request(text){
+  closeMenu();
+  if ($('#resDlg').open) $('#resDlg').close();
+  if (!$('#supportForm')) { $('#community').scrollIntoView(); return; }
+  const f = $('#needField'); f.value = text;
+  if (F.scenario) $('#supScenario').value = F.scenario;
+  $('#community').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
+  setTimeout(() => { f.focus(); f.setSelectionRange(f.value.length, f.value.length); }, 450);
+}
+document.addEventListener('click', e => { const r = e.target.closest('[data-request]'); if (r){ e.preventDefault(); request(r.dataset.request); } });
+$('#answerQotm').addEventListener('click', () => request('My answer to the question of the month (' + $('#qotmTitle').textContent + '): '));
+$('#supportForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target), d = Object.fromEntries(fd);
+  if (!FORM_ENDPOINT){
+    location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('CHIRON – '+d.centre)}&body=${encodeURIComponent(d.need)}`; return;
+  }
+  const ok = await submitWith(e.target.querySelector('[type=submit]'), 'Sending…', () => sendToHub('support', fd));
+  if (!ok) return;
+  $('#supportBox').innerHTML = `<div class="done"><h3>Message sent</h3><p>Thank you, ${esc(d.name.split(' ')[0])}. The CHIRON team will reply in ${esc(d.lang)} within two working days.</p><button class="btn btn-quiet btn-sm" id="again">Send another message</button></div>`;
+  $('#again').onclick = () => location.reload();
+});
+
+/* Calendar buttons */
+document.addEventListener('click', e => { const b = e.target.closest('[data-ics]'); if (b) downloadIcs(b.dataset.ics); });
+
+/* Mobile menu */
+function closeMenu(){ $('#nav').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded','false'); }
+$('#menuBtn').addEventListener('click', () => { const o = $('#nav').classList.toggle('open'); $('#menuBtn').setAttribute('aria-expanded', o); });
+$('#nav').addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
+
+/* ======================================================================
+   START
+   ====================================================================== */
+renderScene(); renderNext(); renderLoop(); renderFilters(); renderResources(); renderBoard(); renderStatic();
+</script>
+</body>
+</html>

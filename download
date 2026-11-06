@@ -1,0 +1,10 @@
+# Secrets never go in this repo (the Clientify key lives in Apps Script → Script properties)
+.env
+*.env
+.clasprc.json
+# Internal review copy (notes, status panel) – keep it out of the public repo
+*review*.html
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
