@@ -12,7 +12,8 @@
  *   CLIENTIFY_TOKEN   (required)  your Clientify API key
  *   SHEET_ID          (optional)  ID of a Google Sheet for a backup copy
  *   NOTIFY_EMAIL      (optional)  e.g. teachers@escolaeuropea.eu – gets an email for every "support" request
- *   CHIRON_PIN        (required for the members area)  the pilot PIN the team gives to member centres
+ *   CHIRON_PINS       (required for the members area)  one PIN per centre, e.g. 1234=Escola Europea; 5678=Università di Genova
+ *                     (the older single CHIRON_PIN still works too)
  *   MEMBERS_FOLDER_ID (optional)  Drive folder of the members library (default below)
  *   TOKEN_SECRET      (automatic) created on first login, do not share
  *
@@ -122,14 +123,50 @@ function handleSupport_(d) {
 
 /* ============================ members area ============================ */
 
+/* Limits on wrong PINs. 4-digit PINs are easy to guess, so attempts are counted:
+   per email (one person mistyping) and in total (someone trying many PINs with many emails). */
+const MAX_BAD_PER_EMAIL = 5;     // in 15 minutes
+const MAX_BAD_TOTAL     = 40;    // in 1 hour, all emails together; after that sign-in pauses until the hour passes
+
+/**
+ * PINs live in the script property CHIRON_PINS, one per centre:
+ *   1234=Escola Europea; 5678=Università di Genova; 9012=Institut eCAT
+ * Separate entries with ; or , or new lines. The "=Centre" part is optional but recommended:
+ * it is written to the log on each sign-in so you can see which centre is using the library.
+ * The older single property CHIRON_PIN still works and is added to the list.
+ */
+function pins_() {
+  const raw = [prop_('CHIRON_PINS'), prop_('CHIRON_PIN')].filter(Boolean).join(';');
+  const map = {};
+  raw.split(/[;,\n]+/).forEach(entry => {
+    const [pin, ...centre] = entry.split('=');
+    const key = normPin_(pin);
+    if (key) map[key] = centre.join('=').trim() || '(no centre name)';
+  });
+  return map;
+}
+const normPin_ = p => String(p || '').replace(/\s+/g, '').toLowerCase();
+
 function login_(d) {
-  const pin = String(prop_('CHIRON_PIN') || '').trim().toLowerCase();
-  if (!pin) return {ok:false, error:'members_closed'};
-  if (String(d.pin || '').trim().toLowerCase() !== pin) return {ok:false, error:'bad_pin'};
+  const pins = pins_();
+  if (!Object.keys(pins).length) return {ok:false, error:'members_closed'};
   const email = String(d.email || '').trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return {ok:false, error:'bad_email'};
+
+  const cache = CacheService.getScriptCache();
+  const kEmail = 'bad:' + email, kTotal = 'bad:total';
+  const badEmail = Number(cache.get(kEmail) || 0), badTotal = Number(cache.get(kTotal) || 0);
+  if (badEmail >= MAX_BAD_PER_EMAIL || badTotal >= MAX_BAD_TOTAL) return {ok:false, error:'too_many'};
+
+  const centre = pins[normPin_(d.pin)];
+  if (!centre) {
+    cache.put(kEmail, String(badEmail + 1), 900);
+    cache.put(kTotal, String(badTotal + 1), 3600);
+    return {ok:false, error:'bad_pin'};
+  }
   const contact = findContactByEmail_(email);
   if (!contact) return {ok:false, error:'not_registered'};
+  console.log(`Members sign-in: ${email} with the PIN of ${centre}`);
   const exp = Date.now() + SESSION_DAYS * 864e5;
   return {ok:true, token: sign_(email + '|' + exp), name: contact.first_name || '', exp: exp};
 }
@@ -260,7 +297,9 @@ function testConnection() {
 /** Step 3: lists what members will see in the library. */
 function testLibrary() {
   CacheService.getScriptCache().remove('library');
-  const t = login_({pin: prop_('CHIRON_PIN'), email: 'international@escolaeuropea.eu'});
+  const pins = pins_();
+  console.log('PINs configured: ' + Object.keys(pins).length + ' (' + Object.values(pins).join(', ') + ')');
+  const t = login_({pin: Object.keys(pins)[0], email: 'international@escolaeuropea.eu'});
   if (!t.ok) { console.log('Login failed: ' + t.error); return; }
   const r = library_({token: t.token});
   console.log(r.ok ? r.items.map(i => `${i.category} | ${i.kind} | ${i.title}`).join('\n') : r.error);

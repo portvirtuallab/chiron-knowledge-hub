@@ -42,7 +42,7 @@ The page never holds the Clientify API key. Forms post to a Google Apps Script w
    - `CLIENTIFY_TOKEN` = Clientify API key (required)
    - `NOTIFY_EMAIL` = teachers@escolaeuropea.eu (optional)
    - `SHEET_ID` = Google Sheet for a backup copy (optional, not used yet)
-   - `CHIRON_PIN` = the PIN member centres use to open the **Members** library (required for the members area; without it every sign-in says "not open yet")
+   - `CHIRON_PINS` = one PIN per centre for the **Members** library, e.g. `1234=Escola Europea; 5678=Università di Genova` (required for the members area; without it every sign-in says "not open yet"). Separate with `;`, `,` or new lines. The centre name is optional and is written to the script log on each sign-in. Wrong PINs are limited: 5 per email every 15 min and 40 in total per hour.
    - `MEMBERS_FOLDER_ID` = Drive folder of the members library (optional; defaults to "CHIRON – Members library"). Each subfolder is a category. Files must be shared "Anyone with the link" so members can open them.
    - `TOKEN_SECRET` is created automatically on the first sign-in. Do not share it.
 3. Run `testConnection`, then `testProfile` (creates a test contact: check it in Clientify, then delete it).
