@@ -12,6 +12,13 @@
  *   CLIENTIFY_TOKEN   (required)  your Clientify API key
  *   SHEET_ID          (optional)  ID of a Google Sheet for a backup copy
  *   NOTIFY_EMAIL      (optional)  e.g. teachers@escolaeuropea.eu – gets an email for every "support" request
+ *   CHIRON_PIN        (required for the members area)  the pilot PIN the team gives to member centres
+ *   MEMBERS_FOLDER_ID (optional)  Drive folder of the members library (default below)
+ *   TOKEN_SECRET      (automatic) created on first login, do not share
+ *
+ * Members area: a teacher signs in with the CHIRON PIN + the email registered in Clientify.
+ * The library is read live from the Drive folder: each subfolder is a category, each file a resource.
+ * Adding a file to the folder publishes it; no code changes needed.
  */
 
 const CLIENTIFY_API = 'https://api.clientify.net/v1';
@@ -35,6 +42,15 @@ const FIELDS = {
   directory:    'CHIRON – Show in directory',   // checkbox (new)
   topics:       'CHIRON – Topics of interest'   // text (new)
 };
+const MEMBERS_FOLDER_DEFAULT = '1_LNIzX8FxBup8eNVCVicJpOMuW81DfFx';   // "CHIRON – Members library"
+const SESSION_DAYS = 30;
+
+/* Extra links that are not files in the folder (YouTube videos, big recordings). Add rows freely. */
+const EXTRA_LINKS = [
+  {category:'Recordings', title:'H1 webinar with Alexander Ariza (December 2025)', url:'https://drive.google.com/file/d/1xHAc3g3eZgGnnzFKFq0BLO7mOE9B2yKW/view', kind:'Video'}
+  // {category:'Recordings', title:'…', url:'https://www.youtube.com/watch?v=…', kind:'Video'},
+];
+
 const LANG_MAP = {'English':'English','Español':'Spanish','Català':'Spanish','Italiano':'Italian','Português':'Portuguese','Français':'French'};
 
 /* ============================ entry points ============================ */
@@ -42,6 +58,8 @@ const LANG_MAP = {'English':'English','Español':'Spanish','Català':'Spanish','
 function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents || '{}');
+    if (d.action === 'login')   return json_(login_(d));
+    if (d.action === 'library') return json_(library_(d));
     if (d.website) return json_({ok:true});                       // honeypot: bots fill it, people don't
     if (!d.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) return json_({ok:false, error:'invalid email'});
     if (!d.privacy) return json_({ok:false, error:'privacy not accepted'});
@@ -100,6 +118,73 @@ function handleSupport_(d) {
   const notify = prop_('NOTIFY_EMAIL');
   if (notify) MailApp.sendEmail({to: notify, replyTo: d.email, subject: `CHIRON request – ${d.centre || d.name}`, body: `${d.name} <${d.email}>\n\n${text}`});
   return id;
+}
+
+/* ============================ members area ============================ */
+
+function login_(d) {
+  const pin = String(prop_('CHIRON_PIN') || '').trim().toLowerCase();
+  if (!pin) return {ok:false, error:'members_closed'};
+  if (String(d.pin || '').trim().toLowerCase() !== pin) return {ok:false, error:'bad_pin'};
+  const email = String(d.email || '').trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return {ok:false, error:'bad_email'};
+  const contact = findContactByEmail_(email);
+  if (!contact) return {ok:false, error:'not_registered'};
+  const exp = Date.now() + SESSION_DAYS * 864e5;
+  return {ok:true, token: sign_(email + '|' + exp), name: contact.first_name || '', exp: exp};
+}
+
+function library_(d) {
+  const email = verify_(d.token);
+  if (!email) return {ok:false, error:'session_expired'};
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get('library');
+  if (hit) return {ok:true, items: JSON.parse(hit)};
+  const root = DriveApp.getFolderById(prop_('MEMBERS_FOLDER_ID') || MEMBERS_FOLDER_DEFAULT);
+  const items = [];
+  const add = (f, category) => {
+    const name = f.getName(), ext = (name.match(/\.([a-z0-9]+)$/i) || [,''])[1].toUpperCase();
+    items.push({category: category, title: name.replace(/\.[a-z0-9]+$/i, ''), kind: kindOf_(ext, f.getMimeType()),
+                url: f.getUrl(), size: f.getSize(), updated: f.getLastUpdated().toISOString()});
+  };
+  const top = root.getFiles(); while (top.hasNext()) add(top.next(), 'Library');
+  const subs = root.getFolders();
+  while (subs.hasNext()) { const s = subs.next(); const fs = s.getFiles(); while (fs.hasNext()) add(fs.next(), s.getName()); }
+  EXTRA_LINKS.forEach(l => items.push(Object.assign({size:0, updated:''}, l)));
+  items.sort((a,b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
+  cache.put('library', JSON.stringify(items), 600);                // 10 min: new files show up within 10 minutes
+  return {ok:true, items: items};
+}
+
+function kindOf_(ext, mime) {
+  if (/^video\//.test(mime) || ['MP4','MOV'].includes(ext)) return 'Video';
+  if (['PPTX','PPT','KEY'].includes(ext) || /presentation/.test(mime)) return 'Slides';
+  if (ext === 'PDF') return 'PDF';
+  if (['DOCX','DOC'].includes(ext) || /document/.test(mime)) return 'Document';
+  if (['XLSX','XLS','CSV'].includes(ext) || /spreadsheet/.test(mime)) return 'Spreadsheet';
+  if (ext === 'HTML') return 'Web page';
+  return ext || 'File';
+}
+
+function secret_() {
+  const props = PropertiesService.getScriptProperties();
+  let s = props.getProperty('TOKEN_SECRET');
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); props.setProperty('TOKEN_SECRET', s); }
+  return s;
+}
+function sign_(payload) {
+  const sig = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(payload, secret_()));
+  return Utilities.base64EncodeWebSafe(payload) + '.' + sig;
+}
+function verify_(token) {
+  try {
+    const [p, sig] = String(token || '').split('.');
+    const payload = Utilities.newBlob(Utilities.base64DecodeWebSafe(p)).getDataAsString();
+    const good = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(payload, secret_()));
+    if (sig !== good) return null;
+    const [email, exp] = payload.split('|');
+    return Number(exp) > Date.now() ? email : null;
+  } catch (e) { return null; }
 }
 
 /* ============================ Clientify ============================ */
@@ -170,6 +255,15 @@ function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).se
 function testConnection() {
   const r = api_('get', '/contacts/?query=international@escolaeuropea.eu');
   console.log('OK. Contacts found for your own email: ' + ((r && r.count) || 0));
+}
+
+/** Step 3: lists what members will see in the library. */
+function testLibrary() {
+  CacheService.getScriptCache().remove('library');
+  const t = login_({pin: prop_('CHIRON_PIN'), email: 'international@escolaeuropea.eu'});
+  if (!t.ok) { console.log('Login failed: ' + t.error); return; }
+  const r = library_({token: t.token});
+  console.log(r.ok ? r.items.map(i => `${i.category} | ${i.kind} | ${i.title}`).join('\n') : r.error);
 }
 
 /** Step 2: creates/updates ONE test contact. Check it in Clientify, then delete it there. */

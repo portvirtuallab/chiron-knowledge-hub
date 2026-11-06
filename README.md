@@ -42,6 +42,9 @@ The page never holds the Clientify API key. Forms post to a Google Apps Script w
    - `CLIENTIFY_TOKEN` = Clientify API key (required)
    - `NOTIFY_EMAIL` = teachers@escolaeuropea.eu (optional)
    - `SHEET_ID` = Google Sheet for a backup copy (optional, not used yet)
+   - `CHIRON_PIN` = the PIN member centres use to open the **Members** library (required for the members area; without it every sign-in says "not open yet")
+   - `MEMBERS_FOLDER_ID` = Drive folder of the members library (optional; defaults to "CHIRON – Members library"). Each subfolder is a category. Files must be shared "Anyone with the link" so members can open them.
+   - `TOKEN_SECRET` is created automatically on the first sign-in. Do not share it.
 3. Run `testConnection`, then `testProfile` (creates a test contact: check it in Clientify, then delete it).
 4. Deploy → New deployment → Web app · Execute as: Me · Who has access: Anyone.
 5. Copy the `/exec` URL into `FORM_ENDPOINT` in `hub/index.html`.
